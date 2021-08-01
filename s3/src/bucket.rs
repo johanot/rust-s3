@@ -11,6 +11,9 @@ use crate::creds::Credentials;
 use crate::region::Region;
 use std::str::FromStr;
 
+use futures::Stream;
+use bytes::Bytes;
+
 pub type Query = HashMap<String, String>;
 
 #[cfg(feature = "with-tokio")]
@@ -578,6 +581,16 @@ impl Bucket {
         let command = Command::GetObject;
         let request = RequestImpl::new(self, path.as_ref(), command);
         request.response_data_to_writer(writer).await
+    }
+
+    #[maybe_async::maybe_async]
+    pub async fn get_object_stream_raw<S: AsRef<str>>(
+        &self,
+        path: S
+    ) -> Result<(Box<dyn Stream<Item = std::result::Result<Bytes, reqwest::Error>>>, u16)> {
+        let command = Command::GetObject;
+        let request = RequestImpl::new(self, path.as_ref(), command);
+        request.response_stream_raw().await
     }
 
     /// Stream file from local path to s3, generic over T: Write.

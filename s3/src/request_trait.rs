@@ -15,6 +15,8 @@ use http::header::{
     HeaderName, ACCEPT, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, DATE, HOST, RANGE,
 };
 use http::HeaderMap;
+use futures::Stream;
+use bytes::Bytes;
 
 #[maybe_async]
 pub trait Request {
@@ -24,6 +26,7 @@ pub trait Request {
     async fn response(&self) -> Result<Self::Response>;
     async fn response_data(&self, etag: bool) -> Result<(Vec<u8>, u16)>;
     async fn response_data_to_writer<T: Write + Send>(&self, writer: &mut T) -> Result<u16>;
+    async fn response_stream_raw(&self) -> Result<(Box<dyn Stream<Item = std::result::Result<Bytes, reqwest::Error>>>, u16)>;
     async fn response_header(&self) -> Result<(Self::HeaderMap, u16)>;
     fn datetime(&self) -> DateTime<Utc>;
     fn bucket(&self) -> Bucket;

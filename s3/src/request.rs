@@ -15,6 +15,8 @@ use anyhow::anyhow;
 use anyhow::Result;
 
 use tokio_stream::StreamExt;
+use futures::Stream;
+use bytes::Bytes;
 
 // Temporary structure for making a request
 pub struct Reqwest<'a> {
@@ -130,6 +132,13 @@ impl<'a> Request for Reqwest<'a> {
         }
 
         Ok(status_code.as_u16())
+    }
+
+    async fn response_stream_raw(&self) -> Result<(Box<dyn Stream<Item = std::result::Result<Bytes, reqwest::Error>>>, u16)> {
+        let response = self.response().await?;
+
+        let status_code = response.status();
+        Ok((Box::new(response.bytes_stream()), status_code.as_u16()))
     }
 
     async fn response_header(&self) -> Result<(Self::HeaderMap, u16)> {

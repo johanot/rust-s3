@@ -25,6 +25,7 @@ attohttpc = { version = "0.17", optional = true, default-features = false }
 aws-creds = { version = "0.26", default-features = false }
 aws-region = "0.23"
 base64 = "0.13.0"
+bytes = "1"
 cfg-if = "1"
 chrono = "0.4"
 futures = { version = "0.3", optional = true }
